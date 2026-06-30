@@ -1,6 +1,8 @@
 # Dev container for building Personal CRM with the Pi coding agent.
-# Installs Node, Pi, agent-browser + headless Chromium, and the web-search tool,
-# so the whole toolchain lives inside the sandbox. See ../README.md.
+# Installs Node, Pi, and agent-browser + headless Chromium, so the toolchain
+# lives inside the sandbox. Pi reaches OpenRouter natively via $OPENROUTER_API_KEY
+# (no models.json). postCreateCommand adds the web-search tool; the agent-browser
+# skill is a one-time manual step (see ../README.md).
 FROM mcr.microsoft.com/devcontainers/javascript-node:24-bookworm
 
 # Headless Chromium for agent-browser. The apt package pulls in every shared

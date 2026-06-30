@@ -18,16 +18,21 @@ Works the same on **macOS and Windows**.
 
 1. Open this folder in VS Code.
 2. Run **"Dev Containers: Reopen in Container"** (Command Palette, `F1`). The first build takes a few
-   minutes — it installs Node, Pi, agent-browser + Chromium, and the web-search tool, and wires up the
-   models. Later starts are instant.
+   minutes — it installs Node, Pi, agent-browser + Chromium, and the web-search tool. Later starts are
+   instant.
 3. Add your API key: create a file named **`.env`** in the project root with one line:
    ```
    OPENROUTER_API_KEY=sk-or-v1-your-key-here
    ```
    `.env` is gitignored, so your key is never committed.
 4. Open a **new terminal** so it picks up the key.
+5. Add the **agent-browser skill** to Pi (one time, interactive — it asks which agent to attach to,
+   so pick **Pi**):
+   ```bash
+   npx skills add vercel-labs/agent-browser
+   ```
 
-That's everything — Pi, the browser, and both models are already configured.
+That's everything — Pi reads your key and finds both models natively through OpenRouter.
 
 ## Run Pi
 
@@ -46,10 +51,12 @@ The CRM runs on port 5173, which is forwarded so you can also open it in your ow
 
 - **Node**, **Pi** (`@earendil-works/pi-coding-agent`), **agent-browser** + headless **Chromium**, and
   **pi-web-access** (the `web_search` tool).
-- The **agent-browser skill** (`npx skills add vercel-labs/agent-browser`). Pi drives the browser
-  through its `bash` tool and loads full usage on demand with `agent-browser skills get core`.
-- `~/.pi/agent/models.json` prewired to OpenRouter, reading your key from `$OPENROUTER_API_KEY`, with
-  DeepSeek V4 Pro (vision) and GLM 5.2 (text-only) ready to switch between.
+- **OpenRouter, natively.** Pi has OpenRouter built in and reads your `$OPENROUTER_API_KEY` from the
+  environment — no `models.json` needed. Its model registry already aggregates OpenRouter's catalog,
+  so you reference any model as `openrouter/<slug>` and Pi knows its capabilities (incl. DeepSeek V4
+  Pro's vision).
+- The **agent-browser skill** is added by you in step 5. Pi drives the browser through its `bash` tool
+  and loads full usage on demand with `agent-browser skills get core`.
 
 ## How the sandboxing works
 
@@ -63,8 +70,10 @@ The CRM runs on port 5173, which is forwarded so you can also open it in your ow
 - **GLM 5.2 is text-only**: when running on it, verify with `agent-browser snapshot -i` (accessibility
   text) plus console output rather than screenshots. **DeepSeek V4 Pro has vision**: use
   `agent-browser screenshot --annotate page.png` for the visual look-and-feel pass.
-- If OpenRouter rejects a model id, try it with or without an `openrouter/` prefix (OpenRouter's API
-  wants the bare slug). `deepseek/deepseek-v4-flash` is a cheaper DeepSeek variant.
+- **If Pi doesn't recognize a model slug** (its registry snapshot can lag a brand-new model), define it
+  yourself in `~/.pi/agent/models.json` under an `openrouter` provider — that's the documented escape
+  hatch. `pi --list-models` shows what your installed Pi already resolves.
+  `deepseek/deepseek-v4-flash` is a cheaper DeepSeek variant.
 - To rebuild after changing the dev container: **"Dev Containers: Rebuild Container"**. Your `.env`
   (in the project) persists.
 - If the browser ever fails to launch, run `agent-browser doctor`; as a fallback,
