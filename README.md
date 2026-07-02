@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=dkuBt6h70ec
+
 # Personal CRM
 
 A simple sales CRM you run on your own computer — think of it as your own private
